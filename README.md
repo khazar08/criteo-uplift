@@ -118,8 +118,6 @@ Reduces ATE estimate variance by ρ² by regressing out a pre-experiment covaria
 
 ## Key results
 
-*(Fill after running notebooks — do not fabricate)*
-
 | Model | Qini coeff | Uplift@10% | Uplift@30% | AUUC |
 |---|---|---|---|---|
 | X-learner | — | — | — | — |
@@ -132,11 +130,6 @@ Reduces ATE estimate variance by ρ² by regressing out a pre-experiment covaria
 
 ---
 
-## Resume bullets
-
-- Built end-to-end **uplift / heterogeneous treatment-effect** pipeline on Criteo's **14M-row** randomized incrementality benchmark; compared S/T/X/R/DR meta-learners + causal forest; X-learner achieved **Qini coefficient [X]**, outperforming propensity baseline by **[Y]%**
-- Proved **outcome ROC-AUC is uninformative for targeting** — persuadables ≠ high-converters; evaluated using Qini/AUUC/uplift@k implemented from scratch and verified against scikit-uplift
-- Designed targeting policy + **power analysis with CUPED variance reduction (ρ²)**; top-30% targeting captured **[Z]% of incremental visits at 30% of spend**
 
 ---
 
