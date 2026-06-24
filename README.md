@@ -139,14 +139,6 @@ Measured on 279,592-row held-out test set (10% slice of full 14M-row dataset).
 
 ---
 
-## Resume bullets
-
-- Built an end-to-end **uplift / heterogeneous treatment-effect** pipeline on Criteo's **14M-row** randomized incrementality benchmark, comparing S/T/X/R/DR meta-learners and a causal forest; X-learner achieved **28.5% higher uplift in the top-10% targeting segment** (uplift@10 = 5.88%) versus a propensity baseline with ROC-AUC = 0.946, driven by imputation-based TE estimation under 85%/15% arm imbalance
-- Proved that **outcome ROC-AUC is the wrong metric for ad targeting** — an AUC-optimized classifier ranked users by baseline conversion probability rather than causal lift, underperforming CATE models by 28.5% on the targeting decision that matters; implemented Qini curve, Qini coefficient, AUUC, and uplift@k from scratch, verified against scikit-uplift
-- Designed the **targeting policy + power analysis with CUPED variance reduction (ρ² = 0.31)**; top-30% targeting captured **82.4% of incremental visits at 30% of spend**, and CUPED reduced required experiment sample size by **31%** for the same MDE
-
----
-
 ## References
 
 - Diemert, Betlei, Renaudin, Amini (2018). *A Large Scale Benchmark for Uplift Modeling.* AdKDD/KDD.
