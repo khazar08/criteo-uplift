@@ -1,5 +1,5 @@
 # Incrementality & Heterogeneous Treatment Effect Estimation
-### Criteo AI Lab Uplift Benchmark — CATE on 14M rows
+### Criteo AI Lab Uplift Benchmark, CATE on 14M rows
 
 **Targeting the top 30% of users by predicted uplift captures 82.4% of incremental visits at 30% of spend** — with the X-learner achieving a Qini coefficient of 0.081 and 28.5% higher uplift in the top-10% targeting segment versus a propensity-score baseline (ROC-AUC = 0.946).
 
