@@ -1,20 +1,3 @@
-"""
-CUPED — Controlled-experiment Using Pre-Experiment Data (Deng et al. 2013).
-
-Reduces ATE estimate variance by regressing out a covariate X_pre that is:
-  (a) correlated with the outcome Y
-  (b) independent of treatment T
-
-Y_cuped = Y - theta * (X_pre - E[X_pre])
-theta    = Cov(Y, X_pre) / Var(X_pre)     [OLS coefficient]
-
-Variance reduction ≈ rho^2   where rho = Corr(Y, X_pre).
-
-Honesty caveat (stated in writeup): Criteo has no true pre-experiment period.
-We use a control-arm-trained outcome prediction as a proxy for X_pre. This
-satisfies (b) if we compute it on a held-out split. The limitation is noted.
-"""
-
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -58,10 +41,6 @@ def cuped_ate(
     t: np.ndarray,
     x_pre: np.ndarray,
 ) -> dict:
-    """
-    Compute ATE and 95% CI before and after CUPED adjustment.
-    Shows concretely how CUPED shrinks the confidence interval.
-    """
     theta = theta_estimate(y, x_pre)
     y_c = apply_cuped(y, x_pre, theta)
 
