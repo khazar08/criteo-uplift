@@ -1,10 +1,3 @@
-"""
-Targeting policy: turn tau_hat(x) into a business decision.
-
-Core output: "targeting the top X% by predicted uplift captures Y% of incremental
-visits at X% of spend" — the exact sentence an experimentation interviewer wants.
-"""
-
 import numpy as np
 from typing import Tuple
 
@@ -15,14 +8,6 @@ def targeting_curve(
     t: np.ndarray,
     n_points: int = 100,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """
-    Sweep the targeting threshold from 0% to 100% of population.
-
-    Returns:
-        fractions  — fraction of population treated (spend proxy)
-        incremental — cumulative incremental visits captured
-        total_incremental — total incremental visits in dataset (denominator)
-    """
     order = np.argsort(uplift)[::-1]
     y_s, t_s, u_s = y[order], t[order], uplift[order]
 
@@ -58,10 +43,6 @@ def targeting_curve(
 
 
 def sleeping_dogs_analysis(uplift: np.ndarray, t: np.ndarray, y: np.ndarray) -> dict:
-    """
-    Identify Sleeping Dogs: users with negative predicted uplift.
-    Show the incremental gain from excluding them from targeting.
-    """
     negative_mask = uplift < 0
     n_sleeping = negative_mask.sum()
     pct_sleeping = float(n_sleeping / len(uplift) * 100)
