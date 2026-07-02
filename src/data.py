@@ -1,8 +1,3 @@
-"""
-Data loading, preprocessing, and caching for Criteo Uplift dataset.
-Handles CSV -> parquet conversion, float32 downcasting, and train/test splits.
-"""
-
 import os
 import numpy as np
 import pandas as pd
@@ -17,7 +12,6 @@ DROP_COLS = ["exposure"]
 
 
 def load_data(percent10: bool = True, use_cache: bool = True) -> pd.DataFrame:
-    """Load Criteo uplift dataset with parquet caching and float32 downcasting."""
     DATA_DIR.mkdir(exist_ok=True)
 
     cache_key = "10pct" if percent10 else "full"
@@ -81,7 +75,6 @@ def split(
     seed: int = 42,
     label: str = "visit",
 ):
-    """Stratified split preserving treatment ratio. Returns (train, val, test)."""
     strat = df["treatment"].astype(str) + "_" + df[label].astype(str)
     train_val, test = train_test_split(
         df, test_size=test_size, stratify=strat, random_state=seed
@@ -97,7 +90,6 @@ def split(
 
 
 def get_Xyt(df: pd.DataFrame, label: str = "visit"):
-    """Return feature matrix, outcome, treatment arrays as numpy float32."""
     X = df[FEATURE_COLS].values.astype("float32")
     y = df[label].values.astype("float32")
     t = df["treatment"].values.astype("float32")
