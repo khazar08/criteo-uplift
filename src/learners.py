@@ -1,15 +1,3 @@
-"""
-Meta-learner wrappers: S / T / X / R / DR.
-
-Treatment imbalance (~85% treated) is the narrative thread:
-  - S-learner: regularization shrinks T coefficient toward 0 — biased in small-effect regime
-  - T-learner: control arm is small (15%) → noisy mu0
-  - X-learner: imputes TEs from the large arm to fix T-learner's noisy mu0;
-               propensity weighting then puts 85% weight on tau0 (estimated from
-               the large treated arm via imputed D0) — the correct correction
-  - R/DR: cross-fitted nuisances; DR is doubly robust (known propensity here = best case)
-"""
-
 import numpy as np
 from sklearn.base import clone
 from sklearn.model_selection import KFold
@@ -23,7 +11,6 @@ _DEFAULT_REG = lambda: LGBMRegressor(
     n_estimators=300, learning_rate=0.05, num_leaves=63,
     n_jobs=-1, verbose=-1, random_state=42
 )
-
 
 class SLearner:
     """Single model with T as a feature. Fast but shrinks T toward 0."""
@@ -47,8 +34,6 @@ class SLearner:
 
 
 class TLearner:
-    """Two separate outcome models. Noisy in the small (control) arm."""
-
     def __init__(self):
         self.mu1 = _DEFAULT_CLF()
         self.mu0 = _DEFAULT_CLF()
@@ -63,20 +48,6 @@ class TLearner:
 
 
 class XLearner:
-    """
-    X-learner (Künzel et al. 2019).
-
-    Step 1: fit mu0, mu1 as in T-learner.
-    Step 2: impute individual TEs:
-        D1 = Y1 - mu0(X1)   [treated: what *would* they have done without ad?]
-        D0 = mu1(X0) - Y0   [control: what *would* they have done with ad?]
-    Step 3: fit tau1 on D1, tau0 on D0.
-    Step 4: combine with propensity:
-        tau(x) = e(x)*tau0(x) + (1-e(x))*tau1(x)
-        With e≈0.85: weights tau0 heavily — tau0 is estimated from the
-        *large treated arm via D0 imputation*, so this is the variance win.
-    """
-
     def __init__(self, propensity: float = 0.85):
         self.e = propensity
         self.mu0 = _DEFAULT_CLF()
@@ -104,15 +75,6 @@ class XLearner:
 
 
 class RLearner:
-    """
-    R-learner (Nie & Wager 2021) with cross-fitting.
-
-    Robinson decomposition: residualize both Y and T, then fit tau on residuals.
-    Cross-fitting prevents overfitting bias in the nuisance models m(x), e(x).
-
-    Minimizes: sum[ (Yi - m(xi)) - (Ti - e(xi)) * tau(xi) ]^2
-    """
-
     def __init__(self, n_folds: int = 5):
         self.n_folds = n_folds
         self.tau = _DEFAULT_REG()
@@ -147,18 +109,6 @@ class RLearner:
 
 
 class DRLearner:
-    """
-    Doubly-robust / AIPW learner (Kennedy 2020) with cross-fitting.
-
-    AIPW pseudo-outcome:
-        psi_i = mu1(x) - mu0(x)
-              + T*(Y - mu1(x)) / e(x)
-              - (1-T)*(Y - mu0(x)) / (1-e(x))
-
-    Doubly robust: consistent if *either* outcome model OR propensity is right.
-    Known constant propensity here = best-case scenario for DR; note this explicitly.
-    """
-
     def __init__(self, n_folds: int = 5, propensity: float | None = None):
         self.n_folds = n_folds
         self.propensity = propensity  # None = estimate from data
