@@ -1,12 +1,3 @@
-"""
-Criteo Uplift — Interactive Dashboard
-
-One screen with three panels:
-  1. Qini curves for all learners (interactive legend)
-  2. Targeting slider → incremental captured vs spend (live update)
-  3. Uplift-by-decile bar chart for the selected model
-"""
-
 import sys
 import os
 
@@ -37,9 +28,6 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ------------------------------------------------------------------
-# Load data
-# ------------------------------------------------------------------
 @st.cache_data
 def load_predictions():
     if not DATA_PATH.exists():
@@ -66,9 +54,6 @@ t_te = saved["t_te"]
 
 model_names = list(predictions.keys())
 
-# ------------------------------------------------------------------
-# Sidebar
-# ------------------------------------------------------------------
 st.sidebar.header("Controls")
 selected_models = st.sidebar.multiselect(
     "Models to show on Qini chart",
@@ -90,9 +75,6 @@ spend_threshold = st.sidebar.slider(
 )
 n_decile_bins = st.sidebar.slider("Decile bins", 5, 20, 10, step=5)
 
-# ------------------------------------------------------------------
-# Metrics summary
-# ------------------------------------------------------------------
 st.subheader("Model Performance Summary")
 rows = []
 for name in model_names:
@@ -119,9 +101,6 @@ with col_r:
 
 st.markdown("---")
 
-# ------------------------------------------------------------------
-# Row 1: Qini curves | Targeting policy
-# ------------------------------------------------------------------
 col1, col2 = st.columns(2)
 
 with col1:
@@ -184,9 +163,7 @@ with col2:
 
 st.markdown("---")
 
-# ------------------------------------------------------------------
-# Row 2: Decile chart | Sleeping Dogs
-# ------------------------------------------------------------------
+
 col3, col4 = st.columns(2)
 
 with col3:
@@ -224,9 +201,6 @@ with col4:
 
 st.markdown("---")
 
-# ------------------------------------------------------------------
-# Footer: core conceptual framing
-# ------------------------------------------------------------------
 with st.expander("The core argument — why ROC-AUC is the wrong metric"):
     st.markdown(
         """
