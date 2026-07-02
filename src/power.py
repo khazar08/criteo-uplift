@@ -1,11 +1,5 @@
-"""
-Sample-size and MDE calculator for two-proportion tests.
-Includes CUPED variance reduction impact on required sample size.
-"""
-
 import numpy as np
 from scipy import stats
-
 
 def sample_size(
     p_base: float,
@@ -14,11 +8,6 @@ def sample_size(
     power: float = 0.80,
     two_sided: bool = True,
 ) -> int:
-    """
-    Per-arm sample size for a two-proportion z-test.
-
-    n = (z_{1-alpha/2} + z_{1-beta})^2 * [p1(1-p1) + p0(1-p0)] / (p1-p0)^2
-    """
     p1 = p_base + mde
     p0 = p_base
     z_alpha = stats.norm.ppf(1 - alpha / (2 if two_sided else 1))
@@ -35,10 +24,6 @@ def mde(
     power: float = 0.80,
     two_sided: bool = True,
 ) -> float:
-    """
-    Minimum detectable effect given per-arm sample size n.
-    Solved by binary search over the sample_size formula.
-    """
     lo, hi = 1e-6, 1 - p_base
     for _ in range(60):
         mid = (lo + hi) / 2
@@ -56,10 +41,6 @@ def cuped_sample_size(
     alpha: float = 0.05,
     power: float = 0.80,
 ) -> dict:
-    """
-    Show how CUPED's rho^2 reduces the required sample size.
-    CUPED reduces variance by (1 - rho^2), which shrinks required n by the same factor.
-    """
     n_raw = sample_size(p_base, mde_target, alpha, power)
     n_cuped = int(np.ceil(n_raw * (1 - rho_sq)))
     return {
@@ -85,7 +66,6 @@ def power_table(
 
 
 def summarize(p_base: float = 0.047, rho_sq: float = 0.10):
-    """Print a human-readable power summary using Criteo's real base rates."""
     print(f"Base rate (visit): {p_base:.3%}")
     print(f"ATE in Criteo ≈ 0.47pp absolute lift above {p_base:.3%}")
     print()
