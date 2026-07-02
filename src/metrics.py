@@ -1,11 +1,3 @@
-"""
-Uplift evaluation metrics implemented from scratch, cross-checked against sklift.
-
-Key insight: we cannot use ROC-AUC because the ground truth label Y(1)-Y(0) is
-never observed for any individual. Instead we evaluate *ranking quality* over the
-population using Qini and AUUC — both rely only on observed (Y, T) pairs.
-"""
-
 import numpy as np
 from typing import Tuple
 
@@ -13,14 +5,6 @@ from typing import Tuple
 def qini_curve(
     y: np.ndarray, uplift: np.ndarray, t: np.ndarray
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Compute the Qini curve by sorting users descending on predicted uplift.
-
-    At each cumulative cut k:
-        Qini(k) = R_t(k) - R_c(k) * (N_t(k) / N_c(k))
-
-    The N_t/N_c rescaling makes the control arm comparable to treatment.
-    """
     order = np.argsort(uplift)[::-1]
     y_s, t_s = y[order], t[order]
 
@@ -35,10 +19,6 @@ def qini_curve(
 
 
 def qini_auc(y: np.ndarray, uplift: np.ndarray, t: np.ndarray) -> float:
-    """
-    Area between the Qini curve and the random (diagonal) baseline.
-    Positive = better than random targeting; negative = worse.
-    """
     x, q = qini_curve(y, uplift, t)
     # random baseline: straight line from 0 to q[-1]
     rand = q[-1] * x / x[-1]
@@ -46,10 +26,6 @@ def qini_auc(y: np.ndarray, uplift: np.ndarray, t: np.ndarray) -> float:
 
 
 def qini_coefficient(y: np.ndarray, uplift: np.ndarray, t: np.ndarray) -> float:
-    """
-    Normalized Qini: qini_auc / perfect_qini_auc.
-    Ranges roughly [0, 1] for sensible models.
-    """
     model_auc = qini_auc(y, uplift, t)
     # perfect model: sort by true uplift (oracle — use actual y, t)
     # oracle = treated responders first, then control non-responders last
@@ -61,7 +37,6 @@ def qini_coefficient(y: np.ndarray, uplift: np.ndarray, t: np.ndarray) -> float:
 
 
 def auuc(y: np.ndarray, uplift: np.ndarray, t: np.ndarray) -> float:
-    """Area Under the Uplift Curve (unnormalized, normalized by n)."""
     x, q = qini_curve(y, uplift, t)
     return float(np.trapezoid(q, x) / len(y))
 
@@ -69,10 +44,6 @@ def auuc(y: np.ndarray, uplift: np.ndarray, t: np.ndarray) -> float:
 def uplift_at_k(
     y: np.ndarray, uplift: np.ndarray, t: np.ndarray, k: float = 0.10
 ) -> float:
-    """
-    Realized uplift (visit_rate_treated - visit_rate_control) in the top-k fraction
-    by predicted uplift. This is the number a PM cares about.
-    """
     n = len(y)
     cutoff = max(1, int(np.ceil(k * n)))
     order = np.argsort(uplift)[::-1][:cutoff]
@@ -91,11 +62,6 @@ def uplift_at_k(
 def uplift_by_decile(
     y: np.ndarray, uplift: np.ndarray, t: np.ndarray, n_bins: int = 10
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Bin users into n_bins by predicted uplift, compute realized uplift per bin.
-    A monotone-decreasing staircase means the model genuinely ranks persuadables.
-    Returns (bin_centers, realized_uplift_per_bin).
-    """
     order = np.argsort(uplift)[::-1]
     y_s, t_s = y[order], t[order]
     bins = np.array_split(np.arange(len(y_s)), n_bins)
