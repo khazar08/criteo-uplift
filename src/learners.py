@@ -149,8 +149,6 @@ class DRLearner:
     def predict(self, X):
         return self.tau.predict(X)
 
-
-# convenience registry for iteration
 LEARNERS = {
     "S-learner": SLearner,
     "T-learner": TLearner,
