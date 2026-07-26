@@ -1,7 +1,6 @@
 # Incrementality Estimation on Criteo Uplift — Internal Memo
 
 **Team:** Experimentation / Marketing Science  
-**Author:** Khazar  
 **Dataset:** Criteo AI Lab Uplift Benchmark v2.1 (Diemert et al., KDD 2018) — 14M users, randomized  
 
 ---
