@@ -49,19 +49,6 @@ This is the same "wrong metric" instinct as our Azerbaijani NLP finding (Cohen's
 
 **DR-learner robustness:** The AIPW pseudo-outcome is consistent if *either* the outcome model *or* the propensity is correctly specified. Here propensity is known (constant, ~0.85), making this the best-case scenario for DR. Cross-fitting prevents overfitting bias in the nuisance models.
 
----
-
-## Targeting Policy
-
-Using the best model (X-learner) on the held-out test set:
-
-**Targeting the top 30% of users by predicted uplift captures approximately [X]% of incremental visits at 30% of spend.**
-
-- Top 10% → [Y]% of incrementals at 10% of spend
-- Top 30% → [Z]% of incrementals at 30% of spend  
-- Sleeping Dogs identified: [N]% of population — excluding them yields a further improvement in ROI at zero incremental spend
-
-*Fill with measured values after running notebook 05.*
 
 ---
 
