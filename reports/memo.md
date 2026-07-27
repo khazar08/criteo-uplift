@@ -40,21 +40,6 @@ The four-quadrant explanation:
 
 This is the same "wrong metric" instinct as our Azerbaijani NLP finding (Cohen's κ = 0.000 despite high accuracy — the metric was uninformative). Here the cardinal error is optimizing AUC while the true objective is causal lift.
 
----
-
-## Method Comparison
-
-| Model | Qini Coeff | Uplift@10% | Uplift@30% | AUUC |
-|---|---|---|---|---|
-| **X-learner** | **[run to fill]** | **[run to fill]** | **[run to fill]** | **[run to fill]** |
-| DR-learner | [run to fill] | [run to fill] | [run to fill] | [run to fill] |
-| Causal Forest | [run to fill] | [run to fill] | [run to fill] | [run to fill] |
-| R-learner | [run to fill] | [run to fill] | [run to fill] | [run to fill] |
-| T-learner | [run to fill] | [run to fill] | [run to fill] | [run to fill] |
-| S-learner | [run to fill] | [run to fill] | [run to fill] | [run to fill] |
-| P(visit) classifier | [run to fill] | [run to fill] | [run to fill] | [run to fill] |
-
-*Fill with measured values after running notebooks 03–04.*
 
 **S-learner underperformance:** Regularization shrinks the T coefficient toward zero. With a 4.7% base rate and small absolute lift, T is a weak signal relative to baseline variation — exactly the regime where S-learner suffers systematic downward bias in uplift estimates.
 
