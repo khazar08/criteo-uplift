@@ -199,20 +199,5 @@ with col4:
         "This is why uplift ≠ propensity: a high-converting user can still be a Sleeping Dog."
     )
 
-st.markdown("---")
-
 with st.expander("The core argument — why ROC-AUC is the wrong metric"):
-    st.markdown(
-        """
-**Fundamental problem of causal inference:** Each user has two potential outcomes — Y(1) if shown an ad,
-Y(0) if not. We observe only one. The individual treatment effect Y(1)−Y(0) is *never observed*.
 
-**What we estimate:** CATE = τ(x) = E[Y(1)−Y(0)|X=x]. Targeting = ranking users by τ̂(x).
-
-**The trap:** Optimizing ROC-AUC on the outcome label ranks users by *P(convert)*, not by *P(convert if treated) − P(convert if untreated)*. A Sure Thing (high baseline, near-zero uplift) has high P(convert) but wastes ad spend. A Persuadable (low baseline, high uplift) looks ordinary to the AUC model.
-
-**Why X-learner wins here:** 85% treated / 15% control imbalance → T-learner's mu0 is noisy. X-learner imputes treatment effects from the large arm, then weights by propensity (85% on tau0 estimated from the large arm) — the exact variance fix.
-
-**CUPED:** Reduces ATE estimate variance by ρ², shrinking required experiment size by the same factor. Directly translates to "we need X fewer users to detect the same lift."
-        """
-    )
