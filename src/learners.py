@@ -13,8 +13,6 @@ _DEFAULT_REG = lambda: LGBMRegressor(
 )
 
 class SLearner:
-    """Single model with T as a feature. Fast but shrinks T toward 0."""
-
     def __init__(self):
         self.model = _DEFAULT_CLF()
 
