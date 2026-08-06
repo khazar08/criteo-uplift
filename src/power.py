@@ -80,6 +80,5 @@ def summarize(p_base: float = 0.047, rho_sq: float = 0.10):
     print(f"  Without CUPED: {r['n_raw']:,}/arm")
     print(f"  With CUPED:    {r['n_cuped']:,}/arm  ({r['reduction_pct']:.1f}% fewer users)")
 
-
 if __name__ == "__main__":
     summarize()
