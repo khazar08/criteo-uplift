@@ -54,13 +54,16 @@ criteo-uplift/
 │   ├── cuped.py       # CUPED variance reduction + ATE CI comparison
 │   ├── power.py       # MDE calculator, sample size, CUPED impact
 │   ├── policy.py      # Targeting curve, sleeping dogs, incremental vs spend
-│   └── uplift_roi.py  # Business impact: 4-quadrant budget report + threshold ROI sweep
+│   ├── uplift_roi.py  # Business impact: 4-quadrant budget report + threshold ROI sweep
+│   └── make_figures.py # Re-plots README figures from saved predictions (no retraining)
 ├── app/
 │   └── streamlit_app.py   # Interactive Qini curves + targeting slider
 └── reports/
     ├── memo.md              # 2-page internal experimentation memo
     ├── threshold_curve.png  # Cost-benefit of the targeting threshold
-    └── *.png                # Generated figures
+    ├── qini_comparison.png  # Qini curves, all scorers
+    ├── uplift_by_decile.png # Realized uplift per predicted decile
+    └── trap_demo.png        # X-learner vs P(visit) classifier
 ```
 
 ---
@@ -77,6 +80,7 @@ jupyter notebook notebooks/
 
 # 3. Business-impact layer (after 03 writes data/meta_learner_predictions.pkl)
 python src/uplift_roi.py     # budget report + threshold sweep + reports/threshold_curve.png
+python src/make_figures.py   # re-plots the other README figures from the same pkl
 
 # 4. Launch dashboard (after running 03 + 04 to generate predictions)
 streamlit run app/streamlit_app.py
@@ -133,6 +137,18 @@ Measured on 279,592-row held-out test set (10% slice of full 14M-row dataset).
 | P(visit) classifier | 0.0828 | 4.58% | 3.04% | 2104.1 |
 
 **Reading the table:** The P(visit) classifier has the highest aggregate Qini (integrates over the full curve) but the *lowest* uplift@10% among models that actually attempt CATE estimation — meaning it ranks the wrong users at the top. X-learner and DR-learner identify the top persuadable segment 28–29% more effectively, which is the decision that drives campaign ROI.
+
+![Qini curves — all scorers vs random targeting](reports/qini_comparison.png)
+
+The aggregate Qini hides where the models differ. Note the blue P(visit) curve sitting *below* every CATE learner through the first ~10% of the population before it climbs — it wins on area under the whole curve while losing exactly the decision a campaign makes.
+
+![The AUC trap](reports/trap_demo.png)
+
+Same fact, plotted as the number a PM would act on: in the top 5% the X-learner delivers **7.0pp** realized uplift against the classifier's **3.6pp** — nearly double. Past ~25% the two converge and cross, because by then you are targeting most of the population and ranking barely matters.
+
+![X-learner realized uplift by decile](reports/uplift_by_decile.png)
+
+The staircase is monotone across deciles 1–7, which is the check that the model ranks persuadables rather than converters. **Decile 10 is the honest wrinkle:** it rebounds to +0.58pp instead of going negative — the model's most-negative predictions are not validated out-of-sample. See the Sleeping Dog caveat under Business impact.
 
 **Targeting policy:**
 - Top 10% by predicted uplift → 55.0% of incremental visits at 10% of spend
@@ -195,8 +211,8 @@ Incremental conversions per segment are the sum of predicted uplift over its use
 
 **Three findings:**
 
-- **Targeting only Persuadables cuts spend 86.6% and still buys *more* incremental conversions than treating everyone.** The retention figure is above 100% precisely because the excluded segments are not merely unprofitable — they are subtractive.
-- **Sleeping Dogs are net-negative, not just wasted budget.** 7.1% of users carry −470.7 predicted incremental conversions. Treating them destroys $2,353 of conversion value *on top of* the $995 spent reaching them. A propensity model that ranks by P(visit) has no way to find this segment; it only sees that they look like converters.
+- **Targeting only Persuadables cuts spend 86.6% and still buys *more* incremental conversions than treating everyone.** The retention figure exceeds 100% because, *on the model's own arithmetic*, the excluded segments are not merely unprofitable but subtractive — see the Sleeping Dog caveat below for how far the observed data backs that up.
+- **Sleeping Dogs: the model predicts harm; the test set does not confirm it.** 7.1% of users carry −470.7 *predicted* incremental conversions (mean τ̂ = −2.37pp), which is what drives the −$3,348 net on that row. But their **realized** uplift is **+0.68pp, 95% CI [−0.72pp, +2.08pp]** — point estimate positive, interval straddling zero. The defensible reading is *no detectable effect in either direction*, not proven harm: the 15% control arm leaves only 2,966 control users in this segment, which is why the interval is that wide. Excluding them is still correct — you save the spend and give up nothing measurable — but "treating them destroys value" is a claim this dataset cannot support, and the decile chart above says the same thing.
 - At the campaign's own economics, **the blanket campaign is net-negative (−$3,006)**. The ATE of 0.0107 sits just above the 0.0100 break-even line, so an untargeted rollout is roughly a coin flip. The segmentation is what makes the campaign profitable, not the ad.
 
 ### 2. Cost-benefit threshold simulation
