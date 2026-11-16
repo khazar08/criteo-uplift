@@ -7,7 +7,6 @@ from sklearn.model_selection import train_test_split
 DATA_DIR = Path(__file__).parent.parent / "data"
 PARQUET_PATH = DATA_DIR / "criteo_uplift.parquet"
 FEATURE_COLS = [f"f{i}" for i in range(12)]
-# exposure is post-treatment; conditioning on it induces collider bias — excluded
 DROP_COLS = ["exposure"]
 
 
